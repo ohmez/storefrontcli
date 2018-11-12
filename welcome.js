@@ -8,16 +8,18 @@ var connection = mysql.createConnection({
     database: "bamazon_db"
 });
 /// @todo --- establish functions to select database and edit databse. 
-var storeOptions = ['view available items', 'jump to specific department', 'add an item'];
+var storeOptions = ['view all available items', 'jump to specific department', 'add an item'];
 var departments = ['automotive', 'appliances and tech', 'sports and leasure', 'misc'];
 
 connection.connect((err) => {
     if(err) throw err;
     // openStore();
-    promptList('action',storeOptions,'Welcome to bamazon',returnPrompt);
+    // promptList('action',storeOptions,'Welcome to bamazon',returnPrompt);
+    // departmentPop('automotive');
+    allPop();
 });
 
-function returnPrompt(answer,) {
+function returnPrompt(answer) {
     switch(answer.action) {
         case storeOptions[0]:
         console.log('here are the items available for purchase');
@@ -25,13 +27,31 @@ function returnPrompt(answer,) {
         break;
         case storeOptions[1]:
         console.log('here are the available departments')
-        promptList('action', departments,'Which department would you like to view?', returnPrompt);
+        toDepartments();
         break;
         case storeOptions[2]:
         console.log('lets add an item');
+        // addItem();
         break;
         case departments[0]:
-        // search('automotive')
+        console.log('welcome to the ' + departments[0] +' department.');
+        // search(departments[0])
+        toDepartments();
+        break;
+        case departments[1]:
+        console.log('welcome to the ' + departments[1] +' department.');
+        // search(departments[1])
+        toDepartments();
+        break;
+        case departments[2]:
+        console.log('welcome to the ' + departments[2] +' department.');
+        // search(departments[2])
+        toDepartments();
+        break;
+        case departments[3]:
+        console.log('welcome to the ' + departments[3] +' department.');
+        // search(departments[3])
+        toDepartments();
         break;
         default:
         console.log('something went wrong');
@@ -52,4 +72,23 @@ function promptList(name, choices, message, callback) {
 
 function openStore() {
     promptList('action',storeOptions,'Welcome to bamazon',returnPrompt);
+};
+function toDepartments() {
+    promptList('action', departments,'Which department would you like to view?', returnPrompt);
+};
+
+function departmentPop(department) {
+    var query = 'SELECT * FROM products WHERE ?'
+    connection.query(query,{department_name: department}, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+    })
+};
+
+function allPop() {
+    var query = 'SELECT * FROM products'
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+    })
 };
