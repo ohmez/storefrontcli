@@ -1,0 +1,29 @@
+{
+  "name": "storefrontcli",
+  "version": "1.0.0",
+  "description": "storecront cli app to purchase available inventory inrelation with database storing products",
+  "main": "welcome.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohmez/storefrontcli.git"
+  },
+  "keywords": [
+    "sql",
+    "javascript",
+    "inquierer",
+    "npm's"
+  ],
+  "author": "keagan cheatwood",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ohmez/storefrontcli/issues"
+  },
+  "homepage": "https://github.com/ohmez/storefrontcli#readme",
+  "dependencies": {
+    "inquirer": "^6.2.0",
+    "mysql": "^2.16.0"
+  }
+}
