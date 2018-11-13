@@ -4,7 +4,7 @@ var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "Wh0v1@n",
+    password: "password",
     database: "bamazon_db"
 });
 /// @todo --- establish functions to select database and edit databse. 
@@ -23,7 +23,7 @@ function returnPrompt(answer) {
     switch(answer.action) {
         case storeOptions[0]:
         console.log('here are the items available for purchase');
-        // itemPop();
+        allPop();
         break;
         case storeOptions[1]:
         console.log('here are the available departments')
