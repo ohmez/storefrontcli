@@ -35,22 +35,22 @@ function returnPrompt(answer) {
         break;
         case departments[0]:
         console.log('welcome to the ' + departments[0] +' department.');
-        // search(departments[0])
-        toDepartments();
+        departmentPop(departments[0]);
+        // toDepartments();
         break;
         case departments[1]:
         console.log('welcome to the ' + departments[1] +' department.');
-        // search(departments[1])
-        toDepartments();
+        departmentPop(departments[1]);
+        // toDepartments();
         break;
         case departments[2]:
         console.log('welcome to the ' + departments[2] +' department.');
-        // search(departments[2])
-        toDepartments();
+        departmentPop(departments[2]);
+        // toDepartments();
         break;
         case departments[3]:
         console.log('welcome to the ' + departments[3] +' department.');
-        // search(departments[3])
+        departmentPop(departments[3]);
         toDepartments();
         break;
         default:
@@ -81,7 +81,8 @@ function departmentPop(department) {
     var query = 'SELECT * FROM products WHERE ?'
     connection.query(query,{department_name: department}, (err, res) => {
         if (err) throw err;
-        console.log(res);
+        // console.log(res);
+        makePretty(res);
     })
 };
 
@@ -89,6 +90,28 @@ function allPop() {
     var query = 'SELECT * FROM products'
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
+        // console.log(res[0].item_name);
+        makePretty(res);
+
     })
+};
+
+function makePretty(res) {
+    var pop = [];
+    for(var x=0; x<res.length; x++) {
+        var item_x = {
+            name: res[x].item_name,
+            id: res[x].id,
+            department: res[x].department_name,
+            price: res[x].price,
+            quantity: res[x].avail_quantity
+        };
+        pop.push(item_x);
+
+
+    }
+    promptList('action',pop,'which item would you like to view',returnPrompt);
+    // to-do change action to view and create switch for view. 
+
+    // console.log(pop);
 };
