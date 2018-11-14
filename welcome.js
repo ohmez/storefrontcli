@@ -10,53 +10,105 @@ var connection = mysql.createConnection({
 /// @todo --- establish functions to select database and edit databse. 
 var storeOptions = ['view all available items', 'jump to specific department', 'add an item'];
 var departments = ['automotive', 'appliances and tech', 'sports and leasure', 'misc'];
+var available = [];
 
 connection.connect((err) => {
     if(err) throw err;
-    // openStore();
     // promptList('action',storeOptions,'Welcome to bamazon',returnPrompt);
     // departmentPop('automotive');
-    allPop();
+    availablePop();
+    openStore();
 });
 
 function returnPrompt(answer) {
+    // console.log(answer);
+    for (var x = 0; x <available.length; x++) {
+        switch(answer.view){
+            case available[x]:
+            var item_id;
+            connection.query('SELECT * FROM products WHERE ?', {item_name: available[x]},(err,res) =>{
+                console.log('\n\n');
+                res = res[0];
+                item_id = res.id;
+                console.log('Item: ' + res.item_name+
+                            '\nDepartment: ' +res.department_name +
+                            '\nPrice: ' + res.price +
+                            '\nQuantity: ' + res.avail_quantity + '\n\n');
+                inquirer.prompt({name: 'purchase', type:'list',message: 'Would you like to purchase this item?', choices: ['yes','no']})
+                .then(answers => {
+                    switch (answers.purchase) {
+                        case 'yes':
+                        console.log('heres your item');
+                        break;
+                        case 'no':
+                        openStore();
+                        break;
+                    }
+                })
+            }); // end query
+            return;
+            
+        } // end switch
+    }
+    
     switch(answer.action) {
+     
         case storeOptions[0]:
+        console.clear();
         console.log('here are the items available for purchase');
         allPop();
         break;
         case storeOptions[1]:
+        console.clear();
         console.log('here are the available departments')
         toDepartments();
         break;
         case storeOptions[2]:
+        console.clear();
         console.log('lets add an item');
         // addItem();
         break;
         case departments[0]:
+        console.clear();
         console.log('welcome to the ' + departments[0] +' department.');
         departmentPop(departments[0]);
         // toDepartments();
         break;
         case departments[1]:
+        console.clear();
         console.log('welcome to the ' + departments[1] +' department.');
         departmentPop(departments[1]);
         // toDepartments();
         break;
         case departments[2]:
+        console.clear();
         console.log('welcome to the ' + departments[2] +' department.');
         departmentPop(departments[2]);
         // toDepartments();
         break;
         case departments[3]:
+        console.clear();
         console.log('welcome to the ' + departments[3] +' department.');
         departmentPop(departments[3]);
         toDepartments();
         break;
         default:
+        console.clear();
         console.log('something went wrong');
         return openStore();
     }
+};
+
+
+function availablePop() {
+    connection.query('SELECT * FROM products', (err, res) => {
+        if (err) throw err;
+        // console.log(res[0].item_name);
+        for(var x=0; x<res.length; x++) {
+            available.push(res[x].item_name);
+        };
+        // console.log(available);
+    });
 };
 
 function promptList(name, choices, message, callback) {
@@ -110,8 +162,13 @@ function makePretty(res) {
 
 
     }
-    promptList('action',pop,'which item would you like to view',returnPrompt);
+    promptList('view',pop,'which item would you like to view',returnPrompt);
     // to-do change action to view and create switch for view. 
 
     // console.log(pop);
+};
+
+function purchaseItem(itemId) {
+
+
 };
