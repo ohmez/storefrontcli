@@ -26,10 +26,12 @@ function returnPrompt(answer) {
         switch(answer.view){
             case available[x]:
             var item_id;
+            var item_quant;
             connection.query('SELECT * FROM products WHERE ?', {item_name: available[x]},(err,res) =>{
                 console.log('\n\n');
                 res = res[0];
                 item_id = res.id;
+                item_quant = res.avail_quantity;
                 console.log('Item: ' + res.item_name+
                             '\nDepartment: ' +res.department_name +
                             '\nPrice: ' + res.price +
@@ -38,7 +40,17 @@ function returnPrompt(answer) {
                 .then(answers => {
                     switch (answers.purchase) {
                         case 'yes':
-                        console.log('heres your item');
+                            item_quant -= 1; 
+                            if(item_quant <= 0) {
+                            //do nothing
+                            }else {
+                            var sqlC = 'UPDATE products SET avail_quantity = item_quant WHERE id = item_id;';
+                            connection.query(sqlC,(err,res) => {
+                                if (err) throw err;
+                                console.log(res);
+                            });
+                            console.log('heres your item');
+                            }
                         break;
                         case 'no':
                         openStore();
