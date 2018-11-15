@@ -10,7 +10,8 @@ item_name VARCHAR(100) NOT NULL,
 department_name VARCHAR(100),
 price DECIMAL(10,2) NOT NULL,
 avail_quantity INT(100) NOT NULL,
-PRIMARY KEY(id)
+PRIMARY KEY(id),
+CHECK (avail_quantity>=1)
 );
 INSERT INTO products (item_name, department_name, price, avail_quantity)
 VALUES ('bike','sports and leasure ',45.75, 1), ("skis",'sports and leasure', 90.75, 4),
