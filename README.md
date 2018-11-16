@@ -1,6 +1,7 @@
 # storefrontcli
 Here I built a database, and established a connection to it through node.
 The database holds inventory and the node application allows you to view and purchase them.
+Use of this requires node and `npm install` after cloning, the JSON packet will pull the needed dependencies.
 
 ## Index
 [Process](#Process)
