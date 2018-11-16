@@ -27,30 +27,25 @@ function returnPrompt(answer) {
             case available[x]:
             var item_id;
             var item_quant;
+            var item_cost;
             connection.query('SELECT * FROM products WHERE ?', {item_name: available[x]},(err,res) =>{
                 console.log('\n\n');
                 res = res[0];
                 item_id = res.id;
                 item_quant = res.avail_quantity;
+                item_cost = res.price;
                 console.log('Item: ' + res.item_name+
                             '\nDepartment: ' +res.department_name +
-                            '\nPrice: ' + res.price +
+                            '\nPrice: $' + res.price +
                             '\nQuantity: ' + res.avail_quantity + '\n\n');
                 inquirer.prompt({name: 'purchase', type:'list',message: 'Would you like to purchase this item?', choices: ['yes','no']})
                 .then(answers => {
                     switch (answers.purchase) {
                         case 'yes':
-                            item_quant -= 1; 
-                            if(item_quant <= 0) {
-                            //do nothing
-                            }else {
-                            var sqlC = 'UPDATE products SET avail_quantity = item_quant WHERE id = item_id;';
-                            connection.query(sqlC,(err,res) => {
-                                if (err) throw err;
-                                console.log(res);
-                            });
-                            console.log('heres your item');
-                            }
+                            inquirer.prompt({name: 'amount', type:'input',message: 'How many would you like?'})
+                            .then(answers => {
+                                purchaseItem(item_id, item_quant, answers.amount, item_cost);
+                                });
                         break;
                         case 'no':
                         openStore();
@@ -78,7 +73,7 @@ function returnPrompt(answer) {
         case storeOptions[2]:
         console.clear();
         console.log('lets add an item');
-        // addItem();
+        addItem();
         break;
         case departments[0]:
         console.clear();
@@ -134,12 +129,8 @@ function promptList(name, choices, message, callback) {
     })
 };
 
-function openStore() {
-    promptList('action',storeOptions,'Welcome to bamazon',returnPrompt);
-};
-function toDepartments() {
-    promptList('action', departments,'Which department would you like to view?', returnPrompt);
-};
+function openStore() { promptList('action',storeOptions,'Welcome to bamazon',returnPrompt); };
+function toDepartments() { promptList('action', departments,'Which department would you like to view?', returnPrompt); };
 
 function departmentPop(department) {
     var query = 'SELECT * FROM products WHERE ?'
@@ -154,9 +145,7 @@ function allPop() {
     var query = 'SELECT * FROM products'
     connection.query(query, (err, res) => {
         if (err) throw err;
-        // console.log(res[0].item_name);
         makePretty(res);
-
     })
 };
 
@@ -171,16 +160,62 @@ function makePretty(res) {
             quantity: res[x].avail_quantity
         };
         pop.push(item_x);
-
-
     }
     promptList('view',pop,'which item would you like to view',returnPrompt);
-    // to-do change action to view and create switch for view. 
-
-    // console.log(pop);
 };
 
-function purchaseItem(itemId) {
+function purchaseItem(itemId, aQuant, quant,cost) {
+    var availQ = aQuant;     
+    if(quant> availQ) {
+        console.log("There's not enough quantity for that purchase");
+        openStore();
+    } else {  
+        var sqlC = 'UPDATE products SET avail_quantity ='+ (availQ -quant) +' WHERE id ='+ itemId+';';
+        connection.query(sqlC,(err,res) => {
+            if (err) throw err;
+            if(res.protocol41) {
+                console.log('\nheres your order \n' +'total cost: $' + (cost*quant)+'\n');
+            }
+        });
+        availQ -= quant; 
+        if(availQ <= 0) {
+            sqlC = 'DELETE FROM products WHERE id='+itemId+';';
+            connection.query(sqlC,(err,res) => {
+                if (err) throw err;
+                if(res.protocol41) {
+                    console.log('thanks for purchasing our total inventory \n\n');
+                }
+            });
+        }  
+        setTimeout(morePurchases,1000);
+    }
+};
 
+function morePurchases() {
+    inquirer.prompt({name: 'again',type:'list',message: 'Would you like to view more items?', choices: ['yes','no']})
+        .then(answers => {
+            if (answers.again === 'yes') {
+                openStore();
+            } else {
+                return console.log("thanks for shopping at bamazon, where everythings instant and imaginary"), connection.end();
+            }
+        }); 
+};
 
+function addItem() {
+    var newSql = 'INSERT INTO products (item_name, department_name, price, avail_quantity) VALUES (?,?,?,?)';
+    inquirer.prompt([{name: 'name', type: 'input', message: 'Whats your item name'},
+    {name: 'department', type:'list', choices: departments, message:'Which department suits your item?'},
+    {name: 'price', type:'input', message:'How much would you like for your item?'},
+    {name: 'quantity', type: 'input', message:'available quantity: '}])
+    .then(answers =>{
+        connection.query(newSql,[answers.name, answers.department, answers.price, answers.quantity], (err,res) =>{
+            if(err) {console.log(err.sqlMessage), openStore();}
+            else {
+            console.log(res.affectedRows + ' inventory created');
+            availablePop();
+            openStore();
+            }
+        })
+    })
 };
