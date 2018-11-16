@@ -65,5 +65,7 @@ It wasn't a big issues but it required me to go to their website and look into t
 
 ![Add an Item](examples/addItem.PNG)
 
+![Database Table](examples/database.PNG)
+
 and a video example
 [Video Link](examples/example.webm)
